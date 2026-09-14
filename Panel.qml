@@ -415,31 +415,29 @@ Panel {
     anchors.fill: parent
     bar: root.bar
     fixedWidth: Style.space(62)
-    opticalSize: Style.space(58)
-    iconComponent: Component {
-      Row {
-        anchors.centerIn: parent
-        spacing: Style.space(4)
+    text: ""
+    hasVisualContent: true
 
-        Image {
-          width: Style.space(13)
-          height: Style.space(13)
-          anchors.verticalCenter: parent.verticalCenter
-          source: root.colorLuminance(root.foreground) >= 0.5
-            ? Qt.resolvedUrl("assets/codex-light.svg")
-            : Qt.resolvedUrl("assets/codex.svg")
-          fillMode: Image.PreserveAspectFit
-        }
+    Image {
+      x: Style.space(9)
+      width: Style.space(13)
+      height: Style.space(13)
+      anchors.verticalCenter: parent.verticalCenter
+      source: root.colorLuminance(root.foreground) >= 0.5
+        ? Qt.resolvedUrl("assets/codex-light.svg")
+        : Qt.resolvedUrl("assets/codex.svg")
+      fillMode: Image.PreserveAspectFit
+    }
 
-        Text {
-          text: root.fiveHourPercentText()
-          color: root.active && root.useActiveColor ? root.activeColor : root.foreground
-          font.family: root.fontFamily
-          font.pixelSize: Style.font.caption
-          font.bold: true
-          anchors.verticalCenter: parent.verticalCenter
-        }
-      }
+    Text {
+      anchors.right: parent.right
+      anchors.rightMargin: Style.space(8)
+      anchors.verticalCenter: parent.verticalCenter
+      text: root.fiveHourPercentText()
+      color: root.active && root.useActiveColor ? root.activeColor : root.foreground
+      font.family: root.fontFamily
+      font.pixelSize: Style.font.caption
+      font.bold: true
     }
     active: root.alarming
     onPressed: function(buttonCode) {
