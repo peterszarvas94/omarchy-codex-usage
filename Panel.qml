@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import qs.Commons
@@ -152,15 +153,29 @@ Panel {
     hasVisualContent: true
     active: root.alarming
 
-    Image {
+    Item {
       x: Style.space(9)
       width: Style.space(13)
       height: Style.space(13)
       anchors.verticalCenter: parent.verticalCenter
-      source: root.colorLuminance(button.foreground) >= 0.5
-        ? Qt.resolvedUrl("assets/codex.svg")
-        : Qt.resolvedUrl("assets/codex-light.svg")
-      fillMode: Image.PreserveAspectFit
+
+      Image {
+        id: barCodexMask
+        anchors.fill: parent
+        source: Qt.resolvedUrl("assets/codex.svg")
+        fillMode: Image.PreserveAspectFit
+        visible: false
+        layer.enabled: true
+      }
+
+      MultiEffect {
+        anchors.fill: parent
+        source: barCodexMask
+        colorization: 1
+        colorizationColor: button.active && button.useActiveColor
+          ? button.activeColor
+          : button.foreground
+      }
     }
 
     Text {
