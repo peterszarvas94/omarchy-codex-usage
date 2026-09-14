@@ -410,11 +410,11 @@ Panel {
     iconComponent: Component {
       Row {
         anchors.centerIn: parent
-        spacing: Style.space(6)
+        spacing: Style.space(4)
 
         Image {
-          width: Style.space(16)
-          height: Style.space(16)
+          width: Style.space(13)
+          height: Style.space(13)
           anchors.verticalCenter: parent.verticalCenter
           source: root.colorLuminance(root.foreground) >= 0.5
             ? Qt.resolvedUrl("assets/codex-light.svg")
