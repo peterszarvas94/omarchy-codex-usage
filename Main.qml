@@ -25,7 +25,7 @@ Item {
   Process {
     id: listProcess
     running: false
-    command: ["find", root.usageDir, "-maxdepth", "1", "-name", "*.json", "-printf", "%f\n"]
+    command: ["find", root.usageDir, "-maxdepth", "1", "-name", "codex.json", "-printf", "%f\n"]
 
     stdout: StdioCollector {
       waitForEnd: true
@@ -148,13 +148,7 @@ Item {
     var command = [root.usageUpdateCommand]
     if (kind === "force") command.push("--force")
     if (kind === "limits") command.push("--limits-only")
-    var providers = settings && settings.providers ? settings.providers : {}
-    for (var id in providers) {
-      if (providers[id] && providers[id].enabled === false) command.push("--except", id)
-    }
-    if (agentIds) {
-      for (var i = 0; i < agentIds.length; i++) command.push(agentIds[i])
-    }
+    command.push("codex")
     return command
   }
 
@@ -211,8 +205,7 @@ Item {
   }
 
   function providerEnabled(id) {
-    if (!settings || !settings.providers || !settings.providers[id]) return true
-    return settings.providers[id].enabled !== false
+    return id === "codex"
   }
 
   // All-time keeps a quiet day from hiding an agent; today's counts admit a
