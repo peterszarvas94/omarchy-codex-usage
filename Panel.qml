@@ -659,7 +659,7 @@ Panel {
             }
 
             Text {
-              visible: text !== ""
+              visible: false
               width: parent.width
               text: root.balanceDetailText(root.balance)
               color: root.dim
