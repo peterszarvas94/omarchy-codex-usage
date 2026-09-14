@@ -433,7 +433,9 @@ Panel {
       anchors.right: parent.right
       anchors.rightMargin: Style.space(8)
       anchors.verticalCenter: parent.verticalCenter
-      text: root.fiveHourPercentText()
+      text: root.limits.length > 0
+        ? Math.round((1 - root.limits[0].percent) * 100) + "%"
+        : ""
       color: root.active && root.useActiveColor ? root.activeColor : root.foreground
       font.family: root.fontFamily
       font.pixelSize: Style.font.caption
