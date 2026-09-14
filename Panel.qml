@@ -406,7 +406,7 @@ Panel {
     anchors.fill: parent
     bar: root.bar
     text: root.session
-      ? Math.round(root.session.percent * 100) + "%"
+      ? Math.round((1 - root.session.percent) * 100) + "%"
       : "󱚣"
     active: root.alarming
     onPressed: function(buttonCode) {
@@ -844,7 +844,7 @@ Panel {
       Text {
         id: limitValue
         text: limitRow.window && limitRow.window.percent >= 0
-          ? Math.round(limitRow.window.percent * 100) + "%"
+          ? Math.round((1 - limitRow.window.percent) * 100) + "%"
           : "—"
         color: limitRow.alarming ? root.urgent : root.foreground
         font.family: root.fontFamily
@@ -856,7 +856,7 @@ Panel {
 
     Meter {
       width: parent.width
-      value: limitRow.window ? limitRow.window.percent : -1
+      value: limitRow.window ? 1 - limitRow.window.percent : -1
       alarming: limitRow.alarming
     }
 
