@@ -165,6 +165,15 @@ Panel {
     return bindingWindow(p)
   }
 
+  function fiveHourPercentText() {
+    var windows = limitWindows(provider)
+    for (var i = 0; i < windows.length; i++) {
+      if (windowSpanMs(windows[i].title) === 5 * 3600 * 1000)
+        return Math.round((1 - windows[i].percent) * 100) + "%"
+    }
+    return session ? Math.round((1 - session.percent) * 100) + "%" : ""
+  }
+
   function weeklyWindow(p) {
     var windows = limitWindows(p)
     for (var i = 0; i < windows.length; i++) {
@@ -423,9 +432,7 @@ Panel {
         }
 
         Text {
-          text: root.session
-            ? Math.round((1 - root.session.percent) * 100) + "%"
-            : ""
+          text: root.fiveHourPercentText()
           color: root.active && root.useActiveColor ? root.activeColor : root.foreground
           font.family: root.fontFamily
           font.pixelSize: Style.font.caption
