@@ -641,6 +641,7 @@ Panel {
               : -1
 
             PanelSectionHeader {
+              visible: false
               width: parent.width
               text: "BALANCE"
               foreground: root.foreground
