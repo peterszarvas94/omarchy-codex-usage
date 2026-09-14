@@ -148,13 +148,14 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    fixedWidth: Style.space(62)
+    fixedWidth: Style.space(50)
     text: ""
     hasVisualContent: true
     active: root.alarming
 
     Item {
-      x: Style.space(9)
+      id: barCodexIcon
+      x: Style.space(7)
       width: Style.space(13)
       height: Style.space(13)
       anchors.verticalCenter: parent.verticalCenter
@@ -179,8 +180,8 @@ Panel {
     }
 
     Text {
-      anchors.right: parent.right
-      anchors.rightMargin: Style.space(8)
+      anchors.left: barCodexIcon.right
+      anchors.leftMargin: Style.space(3)
       anchors.verticalCenter: parent.verticalCenter
       text: root.remainingText(root.shortLimit)
       color: button.active && button.useActiveColor ? button.activeColor : button.foreground
