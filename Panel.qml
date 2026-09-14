@@ -652,7 +652,7 @@ Panel {
             }
 
             Meter {
-              visible: balanceSection.ratio >= 0
+              visible: false
               width: parent.width
               value: balanceSection.ratio
               alarming: root.balanceAlarming
