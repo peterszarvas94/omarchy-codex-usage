@@ -405,9 +405,35 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    text: root.session
-      ? Math.round((1 - root.session.percent) * 100) + "%"
-      : "󱚣"
+    fixedWidth: Style.space(62)
+    opticalSize: Style.space(58)
+    iconComponent: Component {
+      Row {
+        anchors.centerIn: parent
+        spacing: Style.space(6)
+
+        Image {
+          width: Style.space(16)
+          height: Style.space(16)
+          anchors.verticalCenter: parent.verticalCenter
+          source: root.colorLuminance(root.foreground) >= 0.5
+            ? Qt.resolvedUrl("assets/codex-light.svg")
+            : Qt.resolvedUrl("assets/codex.svg")
+          fillMode: Image.PreserveAspectFit
+        }
+
+        Text {
+          text: root.session
+            ? Math.round((1 - root.session.percent) * 100) + "%"
+            : ""
+          color: root.active && root.useActiveColor ? root.activeColor : root.foreground
+          font.family: root.fontFamily
+          font.pixelSize: Style.font.caption
+          font.bold: true
+          anchors.verticalCenter: parent.verticalCenter
+        }
+      }
+    }
     active: root.alarming
     onPressed: function(buttonCode) {
       if (buttonCode === Qt.RightButton) root.launchAgent()
