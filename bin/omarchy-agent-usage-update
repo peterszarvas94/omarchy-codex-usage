@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+real_codex="$(command -v codex || true)"
+if [[ -z "$real_codex" ]]; then
+  exec /usr/share/omarchy/bin/omarchy-agent-usage-update "$@"
+fi
+
+shim_dir="$(mktemp -d)"
+trap 'rm -rf "$shim_dir"' EXIT
+
+cat >"$shim_dir/codex" <<EOF
+#!/usr/bin/env bash
+args=("")
+args=("\$@")
+for ((i = 0; i < \${#args[@]}; i++)); do
+  if [[ \${args[i]} == "-a" && \${args[i + 1]:-} == "untrusted" ]]; then
+    args[i + 1]="never"
+  fi
+done
+exec "$real_codex" "\${args[@]}"
+EOF
+chmod 700 "$shim_dir/codex"
+
+PATH="$shim_dir:$PATH"
+
+/usr/share/omarchy/bin/omarchy-agent-usage-update "$@"
+usage_dir="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/agents/usage"
+record="$(cat "$usage_dir/codex.json")"
+
+# The stock collector exposes rate limits but not the purchased Codex credit
+# balance. Add that field so the existing agents panel can render it using its
+# normal balance components.
+credits=""
+coproc CODEX_APP_SERVER { "$real_codex" -s read-only -a never app-server 2>/dev/null; }
+codex_in="${CODEX_APP_SERVER[1]}"
+codex_out="${CODEX_APP_SERVER[0]}"
+printf '%s\n' \
+  '{"id":1,"method":"initialize","params":{"clientInfo":{"name":"omarchy-agent-usage-credits","version":"1"}}}' \
+  '{"method":"initialized","params":{}}' \
+  '{"id":2,"method":"account/rateLimits/read","params":{}}' >&"$codex_in"
+while IFS= read -r -t 10 line <&"$codex_out"; do
+  if jq -e 'select(.id == 2)' >/dev/null 2>&1 <<<"$line"; then
+    credits="$(jq -r 'select(.id == 2) | .result.rateLimits.credits.balance // empty' <<<"$line")"
+    break
+  fi
+done
+kill "$CODEX_APP_SERVER_PID" 2>/dev/null || true
+wait "$CODEX_APP_SERVER_PID" 2>/dev/null || true
+
+if [[ -n "$credits" ]]; then
+  jq --argjson credits "$credits" \
+    '. + {balance: {remaining: $credits, funded: $credits, spent: 0, currency: "USD"}}' <<<"$record"
+else
+  printf '%s\n' "$record"
+fi
