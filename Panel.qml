@@ -17,6 +17,7 @@ Panel {
   readonly property color surface: Color.popups.background
   readonly property color track: Style.selectedFillFor(foreground, Color.accent)
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
+  readonly property string usagePageUrl: "https://chatgpt.com/codex/cloud/settings/analytics#usage"
 
   readonly property var providers: usage.enabledProviders
   // The selection follows the provider, not the slot it happens to sit in: a
@@ -31,6 +32,7 @@ Panel {
   readonly property var provider: providers.length > 0 ? providers[providerIndex] : null
 
   property bool cursorActive: false
+  property var purchasedCredits: null
 
   // Countdowns and "updated" read this instead of Date.now() so the
   // panel keeps telling the truth while it sits open.
@@ -41,7 +43,7 @@ Panel {
   readonly property var weekly: weeklyWindow(provider)
   readonly property var models: modelRows(provider)
   readonly property var headline: bindingWindow(provider)
-  readonly property var balance: provider ? (provider.balance || null) : null
+  readonly property var balance: purchasedCredits || (provider ? (provider.balance || null) : null)
   // A prepaid account runs low the way a subscription window fills up: the
   // last 10% of the funded credits lights the same alarm.
   readonly property bool balanceAlarming: !!balance && balance.funded > 0
@@ -59,6 +61,25 @@ Panel {
 
   function refreshNow() {
     usage.refreshAll(true)
+  }
+
+  function openUsagePage() {
+    Quickshell.execDetached(["xdg-open", root.usagePageUrl])
+    root.close()
+  }
+
+  FileView {
+    id: creditsFile
+    path: (Quickshell.env("XDG_STATE_HOME") || root.home + "/.local/state")
+      + "/omarchy/agents/usage/codex-credits.json"
+    watchChanges: true
+    printErrors: false
+    onLoaded: {
+      try { root.purchasedCredits = JSON.parse(String(text() || "")) }
+      catch (error) { root.purchasedCredits = null }
+    }
+    onFileChanged: reload()
+    onLoadFailed: root.purchasedCredits = null
   }
 
   function launchAgent() {
@@ -665,6 +686,17 @@ Panel {
               color: root.dim
               font.family: root.fontFamily
               font.pixelSize: Style.font.caption
+            }
+
+            Button {
+              width: parent.width
+              text: "Open Codex usage"
+              bordered: true
+              foreground: root.foreground
+              fontFamily: root.fontFamily
+              fontSize: Style.font.bodySmall
+              verticalPadding: Style.spacing.controlPaddingY
+              onClicked: root.openUsagePage()
             }
           }
 
