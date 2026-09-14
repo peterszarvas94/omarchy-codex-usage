@@ -50,8 +50,11 @@ kill "$CODEX_APP_SERVER_PID" 2>/dev/null || true
 wait "$CODEX_APP_SERVER_PID" 2>/dev/null || true
 
 if [[ -n "$credits" ]]; then
+  tmp="$(mktemp "$usage_dir/.codex.XXXXXX")"
   jq --argjson credits "$credits" \
-    '. + {balance: {remaining: $credits, funded: $credits, spent: 0, currency: "USD"}}' <<<"$record"
+    '. + {balance: {remaining: $credits, funded: $credits, spent: 0, currency: "USD"}}' \
+    <<<"$record" >"$tmp"
+  mv "$tmp" "$usage_dir/codex.json"
 else
-  printf '%s\n' "$record"
+  printf '%s\n' "$record" >"$usage_dir/codex.json"
 fi
