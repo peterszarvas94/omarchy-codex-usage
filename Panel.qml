@@ -85,9 +85,7 @@ Panel {
   function formatMoney(value, currency) {
     var amount = Number(value)
     if (!isFinite(amount)) return "—"
-    var code = String(currency || "USD").toUpperCase()
-    var prefix = code === "USD" ? "$" : code === "EUR" ? "€" : code === "GBP" ? "£" : code + " "
-    return prefix + amount.toFixed(2)
+    return amount.toFixed(2)
   }
 
   function refreshNow() { usage.refreshAll(true) }
