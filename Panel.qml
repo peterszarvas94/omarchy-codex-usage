@@ -64,6 +64,12 @@ Panel {
     return limit ? Math.round((1 - limit.percent) * 100) + "%" : ""
   }
 
+  function barText() {
+    var percentage = remainingText(shortLimit)
+    var credits = balance ? formatMoney(balance.remaining, balance.currency) : ""
+    return percentage && credits ? percentage + " " + credits : percentage || credits
+  }
+
   function resetText(limit) {
     if (!limit || !limit.resetAt) return ""
     var date = new Date(limit.resetAt)
@@ -146,7 +152,7 @@ Panel {
     id: button
     anchors.fill: parent
     bar: root.bar
-    fixedWidth: Style.space(50)
+     fixedWidth: Style.space(80)
     text: ""
     hasVisualContent: true
     active: root.alarming
@@ -181,7 +187,7 @@ Panel {
       anchors.left: barCodexIcon.right
       anchors.leftMargin: Style.space(3)
       anchors.verticalCenter: parent.verticalCenter
-      text: root.remainingText(root.shortLimit)
+       text: root.barText()
       color: button.active && button.useActiveColor ? button.activeColor : button.foreground
       font.family: root.fontFamily
       font.pixelSize: Style.font.caption
